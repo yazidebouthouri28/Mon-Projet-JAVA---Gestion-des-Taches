@@ -1,76 +1,67 @@
 package tn.esprit.services;
 
-import tn.esprit.entities.Lieu;
-import tn.esprit.utils.MyDataBase;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServiceLieu implements IService {
-    private Connection cnx;
+import tn.esprit.entities.Lieu;
+import tn.esprit.utils.MyDataBase;
+
+public class ServiceLieu {
+
+    private Connection connection;
 
     public ServiceLieu() {
-        this.cnx = MyDataBase.getInstance().getConnection();
-        if (this.cnx == null) {
-            throw new IllegalStateException("La connexion à la base est null. Vérifiez MyDataBase !");
+        connection = MyDataBase.getInstance().getConnection();
+    }
+
+    public void ajouter(Lieu lieu) throws SQLException {
+        String query = "INSERT INTO lieu (nom, adresse, capacite) VALUES (?, ?, ?)";
+        try (PreparedStatement pst = connection.prepareStatement(query)) {
+            pst.setString(1, lieu.getNom());
+            pst.setString(2, lieu.getAdresse());
+            pst.setInt(3, lieu.getCapacite());
+            pst.executeUpdate();
         }
     }
 
-    @Override
-    public void ajouter(Lieu l) {
-        String req = "INSERT INTO lieux(nom, adresse, capacite) VALUES(?,?,?)";
-        try (PreparedStatement ps = cnx.prepareStatement(req)) {
-            ps.setString(1, l.getNom());
-            ps.setString(2, l.getAdresse());
-            ps.setInt(3, l.getCapacite());
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
+    public void modifier(Lieu lieu) throws SQLException {
+        String query = "UPDATE lieu SET nom = ?, adresse = ?, capacite = ? WHERE id = ?";
+        try (PreparedStatement pst = connection.prepareStatement(query)) {
+            pst.setString(1, lieu.getNom());
+            pst.setString(2, lieu.getAdresse());
+            pst.setInt(3, lieu.getCapacite());
+            pst.setInt(4, lieu.getId());
+            pst.executeUpdate();
         }
     }
 
-    @Override
-    public void modifier(Lieu l) {
-        String req = "UPDATE lieux SET nom=?, adresse=?, capacite=? WHERE IdLieu=?";
-        try (PreparedStatement ps = cnx.prepareStatement(req)) {
-            ps.setString(1, l.getNom());
-            ps.setString(2, l.getAdresse());
-            ps.setInt(3, l.getCapacite());
-            ps.setInt(4, l.getId());
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
+    public void supprimer(int id) throws SQLException {
+        String query = "DELETE FROM lieu WHERE id = ?";
+        try (PreparedStatement pst = connection.prepareStatement(query)) {
+            pst.setInt(1, id);
+            pst.executeUpdate();
         }
     }
 
-    @Override
-    public void supprimer(int IdLieu) {
-        String req = "DELETE FROM lieux WHERE IdLieu=?";
-        try (PreparedStatement ps = cnx.prepareStatement(req)) {
-            ps.setInt(1, IdLieu);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
-        }
-    }
-
-    @Override
-    public List<Lieu> afficher() {
+    public List<Lieu> afficher() throws SQLException {
         List<Lieu> lieux = new ArrayList<>();
-        String req = "SELECT * FROM lieux";
-        try (Statement st = cnx.createStatement();
-             ResultSet rs = st.executeQuery(req)) {
+        String query = "SELECT * FROM lieu";
+        try (Statement st = connection.createStatement();
+             ResultSet rs = st.executeQuery(query)) {
             while (rs.next()) {
-                Lieu l = new Lieu(
-                        rs.getInt("IdLieu"),
+                Lieu lieu = new Lieu(
+                        rs.getInt("id"),
                         rs.getString("nom"),
                         rs.getString("adresse"),
                         rs.getInt("capacite")
                 );
-                lieux.add(l);
+                lieux.add(lieu);
             }
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
         }
         return lieux;
     }

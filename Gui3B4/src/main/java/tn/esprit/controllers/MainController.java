@@ -6,6 +6,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import tn.esprit.entities.Lieu;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import tn.esprit.services.ServiceLieu;
 
 public class MainController {
     // Références aux éléments FXML
@@ -23,24 +24,22 @@ public class MainController {
     // Label de statut
     @FXML private Label lblStatus;
 
-    // Création d'une liste observable pour les données (au lieu d'utiliser ServiceLieu)
+    // Service pour accéder à la base de données
+    private final ServiceLieu serviceLieu = new ServiceLieu();
+
+    // Liste observable pour les données
     private final ObservableList<Lieu> lieuxData = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
-        System.out.println("Initialisation du contrôleur avec données simulées...");
-
         // Configuration des colonnes
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colNom.setCellValueFactory(new PropertyValueFactory<>("nom"));
         colAdresse.setCellValueFactory(new PropertyValueFactory<>("adresse"));
         colCapacite.setCellValueFactory(new PropertyValueFactory<>("capacite"));
 
-        // Ajouter des données simulées
-        addMockData();
-
-        // Configurer la table
-        tableViewLieux.setItems(lieuxData);
+        // Charger les données depuis la base de données
+        refreshTableData();
 
         // Configurer le listener de sélection
         tableViewLieux.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -50,18 +49,17 @@ public class MainController {
                 txtCapacite.setText(String.valueOf(newSelection.getCapacite()));
             }
         });
-
-        lblStatus.setText("Interface chargée avec données simulées");
-        System.out.println("Interface initialisée avec " + lieuxData.size() + " lieux simulés");
     }
 
-    private void addMockData() {
-        // Ajouter quelques lieux simulés pour tester l'interface
-        lieuxData.add(new Lieu(1, "Hôpital Central", "123 Rue Principale, Tunis", 500));
-        lieuxData.add(new Lieu(2, "Centre de Conférence", "45 Avenue des Sciences, Sfax", 300));
-        lieuxData.add(new Lieu(3, "Salle de Formation Médicale", "78 Boulevard Santé, Sousse", 100));
-        lieuxData.add(new Lieu(4, "Clinique Universitaire", "15 Rue des Médecins, Monastir", 200));
-        lieuxData.add(new Lieu(5, "Centre de Recherche", "31 Avenue Innovation, Hammamet", 150));
+    private void refreshTableData() {
+        try {
+            lieuxData.clear();
+            lieuxData.addAll(serviceLieu.afficher());
+            tableViewLieux.setItems(lieuxData);
+            lblStatus.setText("Données chargées avec succès");
+        } catch (Exception e) {
+            lblStatus.setText("Erreur: " + e.getMessage());
+        }
     }
 
     @FXML
@@ -71,15 +69,15 @@ public class MainController {
             String adresse = txtAdresse.getText();
             int capacite = Integer.parseInt(txtCapacite.getText());
 
-            // Générer un ID simple pour simuler
-            int newId = lieuxData.size() + 1;
-            Lieu nouveauLieu = new Lieu(newId, nom, adresse, capacite);
-            lieuxData.add(nouveauLieu);
-
-            lblStatus.setText("Lieu ajouté avec succès (simulation)");
+            Lieu nouveauLieu = new Lieu(nom, adresse, capacite);
+            serviceLieu.ajouter(nouveauLieu);
+            refreshTableData();
             clearFields();
+            lblStatus.setText("Lieu ajouté avec succès");
         } catch (NumberFormatException e) {
             lblStatus.setText("Erreur: Capacité doit être un nombre");
+        } catch (Exception e) {
+            lblStatus.setText("Erreur lors de l'ajout: " + e.getMessage());
         }
     }
 
@@ -88,17 +86,19 @@ public class MainController {
         Lieu selected = tableViewLieux.getSelectionModel().getSelectedItem();
         if (selected != null) {
             try {
-                selected.setNom(txtNom.getText());
-                selected.setAdresse(txtAdresse.getText());
-                selected.setCapacite(Integer.parseInt(txtCapacite.getText()));
+                String nom = txtNom.getText();
+                String adresse = txtAdresse.getText();
+                int capacite = Integer.parseInt(txtCapacite.getText());
 
-                // Rafraîchir la table pour voir les modifications
-                tableViewLieux.refresh();
-
-                lblStatus.setText("Lieu modifié avec succès (simulation)");
+                Lieu lieuModifie = new Lieu(selected.getId(), nom, adresse, capacite);
+                serviceLieu.modifier(lieuModifie);
+                refreshTableData();
                 clearFields();
+                lblStatus.setText("Lieu modifié avec succès");
             } catch (NumberFormatException e) {
                 lblStatus.setText("Erreur: Capacité doit être un nombre");
+            } catch (Exception e) {
+                lblStatus.setText("Erreur: " + e.getMessage());
             }
         } else {
             lblStatus.setText("Veuillez sélectionner un lieu à modifier");
@@ -109,9 +109,14 @@ public class MainController {
     private void handleSupprimer() {
         Lieu selected = tableViewLieux.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            lieuxData.remove(selected);
-            lblStatus.setText("Lieu supprimé avec succès (simulation)");
-            clearFields();
+            try {
+                serviceLieu.supprimer(selected.getId());
+                refreshTableData();
+                clearFields();
+                lblStatus.setText("Lieu supprimé avec succès");
+            } catch (Exception e) {
+                lblStatus.setText("Erreur: " + e.getMessage());
+            }
         } else {
             lblStatus.setText("Veuillez sélectionner un lieu à supprimer");
         }
@@ -119,8 +124,8 @@ public class MainController {
 
     @FXML
     private void handleAfficher() {
-        lblStatus.setText("Liste des lieux actualisée (simulation)");
-        System.out.println("Affichage des lieux: " + lieuxData.size() + " lieux");
+        refreshTableData();
+        lblStatus.setText("Liste des lieux actualisée");
     }
 
     private void clearFields() {
