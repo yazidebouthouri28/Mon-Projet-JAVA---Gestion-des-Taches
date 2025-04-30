@@ -20,7 +20,7 @@ public class ServiceLieu {
     }
 
     public void ajouter(Lieu lieu) throws SQLException {
-        String query = "INSERT INTO lieu (nom, adresse, capacite) VALUES (?, ?, ?)";
+        String query = "INSERT INTO lieux (nom, adresse, capacite) VALUES (?, ?, ?)";
         try (PreparedStatement pst = connection.prepareStatement(query)) {
             pst.setString(1, lieu.getNom());
             pst.setString(2, lieu.getAdresse());
@@ -30,7 +30,7 @@ public class ServiceLieu {
     }
 
     public void modifier(Lieu lieu) throws SQLException {
-        String query = "UPDATE lieu SET nom = ?, adresse = ?, capacite = ? WHERE id = ?";
+        String query = "UPDATE lieux SET nom = ?, adresse = ?, capacite = ? WHERE IdLieu = ?";
         try (PreparedStatement pst = connection.prepareStatement(query)) {
             pst.setString(1, lieu.getNom());
             pst.setString(2, lieu.getAdresse());
@@ -40,22 +40,22 @@ public class ServiceLieu {
         }
     }
 
-    public void supprimer(int id) throws SQLException {
-        String query = "DELETE FROM lieu WHERE id = ?";
+    public void supprimer(int IdLieu) throws SQLException {
+        String query = "DELETE FROM lieux WHERE IdLieu = ?";
         try (PreparedStatement pst = connection.prepareStatement(query)) {
-            pst.setInt(1, id);
+            pst.setInt(1, IdLieu);
             pst.executeUpdate();
         }
     }
 
     public List<Lieu> afficher() throws SQLException {
         List<Lieu> lieux = new ArrayList<>();
-        String query = "SELECT * FROM lieu";
+        String query = "SELECT * FROM lieux";
         try (Statement st = connection.createStatement();
              ResultSet rs = st.executeQuery(query)) {
             while (rs.next()) {
                 Lieu lieu = new Lieu(
-                        rs.getInt("id"),
+                        rs.getInt("IdLieu"),
                         rs.getString("nom"),
                         rs.getString("adresse"),
                         rs.getInt("capacite")
