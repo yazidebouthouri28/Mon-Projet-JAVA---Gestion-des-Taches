@@ -1,0 +1,25 @@
+/* Style général */
+.root {
+    -fx-font-family: "Arial";
+    -fx-base: #f0f0f0;
+}
+
+/* Boutons */
+.button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-padding: 8px 16px;
+}
+
+.button:hover {
+    -fx-background-color: #45a049;
+}
+
+/* TableView */
+.table-view {
+    -fx-table-cell-border-color: transparent;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #2196F3;
+}

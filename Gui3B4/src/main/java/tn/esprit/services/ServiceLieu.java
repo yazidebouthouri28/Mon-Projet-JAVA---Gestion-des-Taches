@@ -11,6 +11,9 @@ public class ServiceLieu implements IService {
 
     public ServiceLieu() {
         this.cnx = MyDataBase.getInstance().getConnection();
+        if (this.cnx == null) {
+            throw new IllegalStateException("La connexion à la base est null. Vérifiez MyDataBase !");
+        }
     }
 
     @Override

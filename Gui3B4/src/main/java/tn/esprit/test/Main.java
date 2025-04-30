@@ -9,7 +9,7 @@ public class Main {
         ServiceLieu sl = new ServiceLieu();
 
         //Ajouter un nouveau lieu
-        //sl.ajouter(new Lieu("Gassrine", "groupe", 200));
+        //sl.ajouter(new Lieu("SSSSSSSSSSSSSSSS", "xxxxxddddxxxxxxx", 40));
         //System.out.println("Lieu ajouté !");
 
         // Modifier un lieu existant (décommenter pour utiliser)
