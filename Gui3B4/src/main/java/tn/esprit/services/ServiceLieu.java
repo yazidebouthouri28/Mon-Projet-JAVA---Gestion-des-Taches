@@ -8,7 +8,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import tn.esprit.entities.Lieu;
+import tn.esprit.entities.InfoLieu;
 import tn.esprit.utils.MyDataBase;
 
 public class ServiceLieu {
@@ -19,6 +23,7 @@ public class ServiceLieu {
         connection = MyDataBase.getInstance().getConnection();
     }
 
+    // Méthodes existantes pour la gestion des lieux (inchangées)
     public void ajouter(Lieu lieu) throws SQLException {
         String query = "INSERT INTO lieux (nom, adresse, capacite) VALUES (?, ?, ?)";
         try (PreparedStatement pst = connection.prepareStatement(query)) {
@@ -64,5 +69,31 @@ public class ServiceLieu {
             }
         }
         return lieux;
+    }
+
+    // Seule méthode ajoutée pour les événements associés
+    public ObservableList<InfoLieu> getEvenementsParLieu(int lieuId) {
+        ObservableList<InfoLieu> data = FXCollections.observableArrayList();
+        String query = "SELECT * FROM infos_lieux WHERE IdLieu = ?";
+
+        try (PreparedStatement pst = connection.prepareStatement(query)) {
+            pst.setInt(1, lieuId);
+            ResultSet rs = pst.executeQuery();
+
+            while (rs.next()) {
+                InfoLieu info = new InfoLieu(
+                        rs.getInt("IdLieu"),
+                        rs.getString("nom_lieu"),
+                        rs.getString("nom_evenement"),
+                        rs.getInt("IdEvenement"),
+                        rs.getInt("IdReservation"),
+                        rs.getString("commentaires")
+                );
+                data.add(info); // Correction ici
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur SQL: " + e.getMessage());
+        }
+        return data;
     }
 }

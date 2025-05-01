@@ -7,6 +7,12 @@ import tn.esprit.entities.Lieu;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import tn.esprit.services.ServiceLieu;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class MainController {
     // Références aux éléments FXML
@@ -50,6 +56,7 @@ public class MainController {
             }
         });
     }
+
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(title);
@@ -70,7 +77,6 @@ public class MainController {
     }
 
     @FXML
-
     private void handleAjouter() {
         try {
             String nom = txtNom.getText();
@@ -96,7 +102,6 @@ public class MainController {
     }
 
     @FXML
-
     private void handleModifier() {
         Lieu selected = tableViewLieux.getSelectionModel().getSelectedItem();
         if (selected != null) {
@@ -107,7 +112,7 @@ public class MainController {
 
                 // Contrôle de saisie pour la capacité
                 if (capacite < 50) {
-                    showAlert("Erreur de validation", "\"La capacité doit être au moins 50\"");
+                    showAlert("Erreur de validation", "La capacité doit être au moins 50");
                     return;
                 }
 
@@ -153,5 +158,31 @@ public class MainController {
         txtNom.clear();
         txtAdresse.clear();
         txtCapacite.clear();
+    }
+
+    @FXML
+    private void handleAfficherEvents() {
+        Lieu selected = tableViewLieux.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            lblStatus.setText("Veuillez sélectionner un lieu");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/tn/esprit/views/EventsParLieu.fxml"));
+            Parent root = loader.load();
+
+            EventsParLieuController controller = loader.getController();
+            controller.setLieuId(selected.getId());
+
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Événements - " + selected.getNom());
+            stage.show();
+        } catch (IOException e) {
+            lblStatus.setText("Erreur lors du chargement: " + e.getMessage());
+            System.err.println("Erreur: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
