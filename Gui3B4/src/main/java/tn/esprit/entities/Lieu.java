@@ -50,7 +50,10 @@ public class Lieu {
         return capacite;
     }
 
-    public void setCapacite(int capacite) {
+    public void setCapacite(int capacite) throws IllegalArgumentException {
+        if (capacite < 50) {
+            throw new IllegalArgumentException("La capacité doit être supérieure à 50.");
+        }
         this.capacite = capacite;
     }
 

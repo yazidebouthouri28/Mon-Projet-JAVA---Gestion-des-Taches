@@ -50,6 +50,13 @@ public class MainController {
             }
         });
     }
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 
     private void refreshTableData() {
         try {
@@ -63,11 +70,18 @@ public class MainController {
     }
 
     @FXML
+
     private void handleAjouter() {
         try {
             String nom = txtNom.getText();
             String adresse = txtAdresse.getText();
             int capacite = Integer.parseInt(txtCapacite.getText());
+
+            // Contrôle de saisie pour la capacité
+            if (capacite < 50) {
+                showAlert("Erreur de validation", "La capacité doit être au moins 50");
+                return;
+            }
 
             Lieu nouveauLieu = new Lieu(nom, adresse, capacite);
             serviceLieu.ajouter(nouveauLieu);
@@ -75,13 +89,14 @@ public class MainController {
             clearFields();
             lblStatus.setText("Lieu ajouté avec succès");
         } catch (NumberFormatException e) {
-            lblStatus.setText("Erreur: Capacité doit être un nombre");
+            lblStatus.setText("Erreur: Capacité doit être un nombre valide");
         } catch (Exception e) {
             lblStatus.setText("Erreur lors de l'ajout: " + e.getMessage());
         }
     }
 
     @FXML
+
     private void handleModifier() {
         Lieu selected = tableViewLieux.getSelectionModel().getSelectedItem();
         if (selected != null) {
@@ -90,13 +105,19 @@ public class MainController {
                 String adresse = txtAdresse.getText();
                 int capacite = Integer.parseInt(txtCapacite.getText());
 
+                // Contrôle de saisie pour la capacité
+                if (capacite < 50) {
+                    showAlert("Erreur de validation", "\"La capacité doit être au moins 50\"");
+                    return;
+                }
+
                 Lieu lieuModifie = new Lieu(selected.getId(), nom, adresse, capacite);
                 serviceLieu.modifier(lieuModifie);
                 refreshTableData();
                 clearFields();
                 lblStatus.setText("Lieu modifié avec succès");
             } catch (NumberFormatException e) {
-                lblStatus.setText("Erreur: Capacité doit être un nombre");
+                lblStatus.setText("Erreur: Capacité doit être un nombre valide");
             } catch (Exception e) {
                 lblStatus.setText("Erreur: " + e.getMessage());
             }
