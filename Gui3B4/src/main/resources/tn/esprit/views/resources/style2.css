@@ -1,7 +1,8 @@
 /* Fond général avec dégradé complexe et léger motif */
 .root {
     /* Dégradé linéaire sophistiqué dans des tons clairs et apaisants */
-    -fx-background-color: linear-gradient(135deg, #f0f4f8 25%, #d9e2ec 50%, #f0f4f8 75%);
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #eef2f3, #dfe6e9);
+
     /* Si vous souhaitez utiliser une image de fond, décommentez la ligne suivante
     -fx-background-image: url("resources/images/background-pattern.png");
     */

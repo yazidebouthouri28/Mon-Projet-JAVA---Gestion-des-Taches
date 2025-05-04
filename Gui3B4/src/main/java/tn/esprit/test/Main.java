@@ -12,7 +12,7 @@ public class Main {
         try {
             //Ajouter un nouveau lieu
             sl.ajouter(new Lieu("SSSSSSSSSSSSSSSS", "xxxxxxxxxx", 70));
-            System.out.println("Lieu ajouté !");
+            //System.out.println("Lieu ajouté !");
 
              //Modifier un lieu existant (décommenter pour utiliser)
             //sl.modifier(new Lieu(6, "Gassrine", "groupeeeeeeeeee", 999));
