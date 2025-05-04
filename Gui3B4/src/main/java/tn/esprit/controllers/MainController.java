@@ -1,170 +1,215 @@
 package tn.esprit.controllers;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import tn.esprit.entities.Lieu;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import tn.esprit.services.ServiceLieu;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import tn.esprit.entities.Lieu;
+import tn.esprit.services.ServiceLieu;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
 
 public class MainController {
-    // Références aux éléments FXML
-    @FXML private TableView<Lieu> tableViewLieux;
-    @FXML private TableColumn<Lieu, Integer> colId;
-    @FXML private TableColumn<Lieu, String> colNom;
-    @FXML private TableColumn<Lieu, String> colAdresse;
-    @FXML private TableColumn<Lieu, Integer> colCapacite;
+    @FXML private FlowPane cardsContainer;
+    @FXML private VBox sidebar;
+    @FXML private Button btnAjouter;
+    @FXML private Button btnModifier;
+    @FXML private Button btnSupprimer;
+    @FXML private Button btnActualiser;
+    @FXML private Button btnEvenements;
+    @FXML private Button btnQuitter;
 
-    // Champs texte
-    @FXML private TextField txtNom;
-    @FXML private TextField txtAdresse;
-    @FXML private TextField txtCapacite;
-
-    // Label de statut
-    @FXML private Label lblStatus;
-
-    // Service pour accéder à la base de données
     private final ServiceLieu serviceLieu = new ServiceLieu();
-
-    // Liste observable pour les données
-    private final ObservableList<Lieu> lieuxData = FXCollections.observableArrayList();
+    private Lieu selectedLieu = null;
 
     @FXML
     public void initialize() {
-        // Configuration des colonnes
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colNom.setCellValueFactory(new PropertyValueFactory<>("nom"));
-        colAdresse.setCellValueFactory(new PropertyValueFactory<>("adresse"));
-        colCapacite.setCellValueFactory(new PropertyValueFactory<>("capacite"));
+        loadLieuxCards();
 
-        // Charger les données depuis la base de données
-        refreshTableData();
-
-        // Configurer le listener de sélection
-        tableViewLieux.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                txtNom.setText(newSelection.getNom());
-                txtAdresse.setText(newSelection.getAdresse());
-                txtCapacite.setText(String.valueOf(newSelection.getCapacite()));
-            }
-        });
+        // Disable buttons that require selection
+        btnModifier.setDisable(true);
+        btnSupprimer.setDisable(true);
+        btnEvenements.setDisable(true);
     }
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
+    private void loadLieuxCards() {
+        cardsContainer.getChildren().clear();
 
-    private void refreshTableData() {
         try {
-            lieuxData.clear();
-            lieuxData.addAll(serviceLieu.afficher());
-            tableViewLieux.setItems(lieuxData);
-            lblStatus.setText("Données chargées avec succès");
-        } catch (Exception e) {
-            lblStatus.setText("Erreur: " + e.getMessage());
+            List<Lieu> lieux = serviceLieu.afficher();
+            for (Lieu lieu : lieux) {
+                cardsContainer.getChildren().add(createLieuCard(lieu));
+            }
+        } catch (SQLException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
+    }
+
+    private Node createLieuCard(Lieu lieu) {
+        VBox card = new VBox(10);
+        card.getStyleClass().add("lieu-card");
+
+        // Image placeholder
+        ImageView imageView = new ImageView();
+        try {
+            // You can replace this with actual images from your project
+            Image image = new Image(getClass().getResourceAsStream("/images/venue-placeholder.jpg"));
+            imageView.setImage(image);
+        } catch (Exception e) {
+            // Fallback to a colored rectangle
+            imageView.setFitWidth(200);
+            imageView.setFitHeight(150);
+        }
+        imageView.setFitWidth(200);
+        imageView.setFitHeight(150);
+        imageView.getStyleClass().add("card-image");
+
+        Label title = new Label(lieu.getNom());
+        title.getStyleClass().add("card-title");
+
+        Label adresse = new Label(lieu.getAdresse());
+        adresse.getStyleClass().add("card-detail");
+
+        Label capacite = new Label("Capacity: " + lieu.getCapacite());
+        capacite.getStyleClass().add("card-detail");
+
+        // Select button
+        Button btnSelect = new Button("Select");
+        btnSelect.getStyleClass().add("card-button");
+        btnSelect.setOnAction(e -> {
+            selectedLieu = lieu;
+            highlightSelectedCard(card);
+
+            // Enable action buttons
+            btnModifier.setDisable(false);
+            btnSupprimer.setDisable(false);
+            btnEvenements.setDisable(false);
+        });
+
+        card.getChildren().addAll(imageView, title, adresse, capacite, btnSelect);
+        return card;
+    }
+
+    private void highlightSelectedCard(VBox selectedCard) {
+        // Remove highlight from all cards
+        for (Node node : cardsContainer.getChildren()) {
+            if (node instanceof VBox) {
+                node.getStyleClass().remove("selected-card");
+            }
+        }
+
+        // Add highlight to selected card
+        selectedCard.getStyleClass().add("selected-card");
     }
 
     @FXML
     private void handleAjouter() {
         try {
-            String nom = txtNom.getText();
-            String adresse = txtAdresse.getText();
-            int capacite = Integer.parseInt(txtCapacite.getText());
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/tn/esprit/views/AddLieu.fxml"));
+            Parent root = loader.load();
 
-            // Contrôle de saisie pour la capacité
-            if (capacite < 50) {
-                showAlert("Erreur de validation", "La capacité doit être au moins 50");
-                return;
-            }
+            AddLieuController controller = loader.getController();
+            controller.setMainController(this);
 
-            Lieu nouveauLieu = new Lieu(nom, adresse, capacite);
-            serviceLieu.ajouter(nouveauLieu);
-            refreshTableData();
-            clearFields();
-            lblStatus.setText("Lieu ajouté avec succès");
-        } catch (NumberFormatException e) {
-            lblStatus.setText("Erreur: Capacité doit être un nombre valide");
-        } catch (Exception e) {
-            lblStatus.setText("Erreur lors de l'ajout: " + e.getMessage());
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Add New Venue");
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+
+            // Refresh the list after adding
+            loadLieuxCards();
+
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Cannot open add venue window: " + e.getMessage());
         }
     }
 
     @FXML
     private void handleModifier() {
-        Lieu selected = tableViewLieux.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            try {
-                String nom = txtNom.getText();
-                String adresse = txtAdresse.getText();
-                int capacite = Integer.parseInt(txtCapacite.getText());
+        if (selectedLieu == null) {
+            showAlert(Alert.AlertType.WARNING, "Warning", "Please select a venue first");
+            return;
+        }
 
-                // Contrôle de saisie pour la capacité
-                if (capacite < 50) {
-                    showAlert("Erreur de validation", "La capacité doit être au moins 50");
-                    return;
-                }
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/tn/esprit/views/ModifyLieu.fxml"));
+            Parent root = loader.load();
 
-                Lieu lieuModifie = new Lieu(selected.getId(), nom, adresse, capacite);
-                serviceLieu.modifier(lieuModifie);
-                refreshTableData();
-                clearFields();
-                lblStatus.setText("Lieu modifié avec succès");
-            } catch (NumberFormatException e) {
-                lblStatus.setText("Erreur: Capacité doit être un nombre valide");
-            } catch (Exception e) {
-                lblStatus.setText("Erreur: " + e.getMessage());
-            }
-        } else {
-            lblStatus.setText("Veuillez sélectionner un lieu à modifier");
+            ModifyLieuController controller = loader.getController();
+            controller.setLieu(selectedLieu);
+            controller.setMainController(this);
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Modify Venue");
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+
+            // Refresh the list after modification
+            loadLieuxCards();
+
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Cannot open modify venue window: " + e.getMessage());
         }
     }
 
     @FXML
     private void handleSupprimer() {
-        Lieu selected = tableViewLieux.getSelectionModel().getSelectedItem();
-        if (selected != null) {
+        if (selectedLieu == null) {
+            showAlert(Alert.AlertType.WARNING, "Warning", "Please select a venue first");
+            return;
+        }
+
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Confirm Deletion");
+        confirmation.setHeaderText("Delete Venue");
+        confirmation.setContentText("Are you sure you want to delete the venue: " + selectedLieu.getNom() + "?");
+
+        Optional<ButtonType> result = confirmation.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                serviceLieu.supprimer(selected.getId());
-                refreshTableData();
-                clearFields();
-                lblStatus.setText("Lieu supprimé avec succès");
-            } catch (Exception e) {
-                lblStatus.setText("Erreur: " + e.getMessage());
+                serviceLieu.supprimer(selectedLieu.getId());
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Venue successfully deleted!");
+
+                // Reset selection and refresh list
+                selectedLieu = null;
+                btnModifier.setDisable(true);
+                btnSupprimer.setDisable(true);
+                btnEvenements.setDisable(true);
+                loadLieuxCards();
+
+            } catch (SQLException e) {
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed to delete venue: " + e.getMessage());
             }
-        } else {
-            lblStatus.setText("Veuillez sélectionner un lieu à supprimer");
         }
     }
 
     @FXML
-    private void handleAfficher() {
-        refreshTableData();
-        lblStatus.setText("Liste des lieux actualisée");
-    }
-
-    private void clearFields() {
-        txtNom.clear();
-        txtAdresse.clear();
-        txtCapacite.clear();
+    private void handleActualiser() {
+        loadLieuxCards();
+        selectedLieu = null;
+        btnModifier.setDisable(true);
+        btnSupprimer.setDisable(true);
+        btnEvenements.setDisable(true);
+        showAlert(Alert.AlertType.INFORMATION, "Refresh", "Venue list has been refreshed!");
     }
 
     @FXML
-    private void handleAfficherEvents() {
-        Lieu selected = tableViewLieux.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            lblStatus.setText("Veuillez sélectionner un lieu");
+    private void handleEvenements() {
+        if (selectedLieu == null) {
+            showAlert(Alert.AlertType.WARNING, "Warning", "Please select a venue first");
             return;
         }
 
@@ -173,16 +218,30 @@ public class MainController {
             Parent root = loader.load();
 
             EventsParLieuController controller = loader.getController();
-            controller.setLieuId(selected.getId());
+            controller.setLieuId(selectedLieu.getId());
 
             Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Événements - " + selected.getNom());
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Events for " + selectedLieu.getNom());
+            stage.setScene(new Scene(root, 700, 400));
             stage.show();
+
         } catch (IOException e) {
-            lblStatus.setText("Erreur lors du chargement: " + e.getMessage());
-            System.err.println("Erreur: " + e.getMessage());
-            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Cannot open events window: " + e.getMessage());
         }
+    }
+
+    @FXML
+    private void handleQuitter() {
+        Stage stage = (Stage) btnQuitter.getScene().getWindow();
+        stage.close();
+    }
+
+    public void showAlert(Alert.AlertType type, String title, String message) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

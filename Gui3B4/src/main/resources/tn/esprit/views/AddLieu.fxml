@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="400.0" prefWidth="500.0" stylesheets="@resources/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.AddLieuController">
+
+    <VBox spacing="20" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+
+        <Label styleClass="form-title" text="Add New Venue" />
+
+        <GridPane hgap="10" vgap="15">
+            <padding>
+                <Insets top="20" />
+            </padding>
+
+            <Label styleClass="form-label" text="Name:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <TextField fx:id="tfNom" promptText="Enter venue name" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+            <Label styleClass="form-label" text="Address:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <TextField fx:id="tfAdresse" promptText="Enter venue address" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+            <Label styleClass="form-label" text="Capacity:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <TextField fx:id="tfCapacite" promptText="Enter venue capacity (min 50)" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+            <Label styleClass="form-label" text="Image URL:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <HBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                <TextField fx:id="tfImageUrl" promptText="Optional: image path" styleClass="form-field" HBox.hgrow="ALWAYS" />
+                <Button fx:id="btnBrowse" onAction="#handleBrowse" styleClass="small-button" text="Browse" />
+            </HBox>
+         <columnConstraints>
+            <ColumnConstraints />
+            <ColumnConstraints />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+         </rowConstraints>
+        </GridPane>
+
+        <HBox alignment="CENTER_RIGHT" spacing="10">
+            <Button onAction="#handleCancel" styleClass="cancel-button" text="Cancel" />
+            <Button defaultButton="true" onAction="#handleSave" styleClass="save-button" text="Save" />
+        </HBox>
+
+        <Label fx:id="lblError" styleClass="error-label" visible="false" />
+    </VBox>
+</AnchorPane>

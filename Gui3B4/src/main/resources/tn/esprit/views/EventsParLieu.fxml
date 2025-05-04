@@ -1,20 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.EventsParLieuController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="700.0" stylesheets="@resources/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.EventsParLieuController">
+    <top>
+        <VBox spacing="5" styleClass="table-header">
+            <padding>
+                <Insets bottom="10" left="15" right="15" top="10" />
+            </padding>
+            <Label styleClass="table-title" text="Events Associated with Selected Venue" />
+        </VBox>
+    </top>
     <center>
-        <TableView fx:id="tableView" prefHeight="400.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+        <TableView fx:id="tableView" styleClass="events-table" BorderPane.alignment="CENTER">
             <columns>
-                <TableColumn fx:id="colLieuId" prefWidth="60.0" text="ID Lieu" />
-                <TableColumn fx:id="colLieuNom" prefWidth="150.0" text="Nom Lieu" />
-                <TableColumn fx:id="colEventId" prefWidth="60.0" text="ID Event" />
-                <TableColumn fx:id="colEventNom" prefWidth="150.0" text="Nom Event" />
-                <TableColumn fx:id="colReservationId" prefWidth="80.0" text="ID Rés." />
+                <TableColumn fx:id="colLieuId" prefWidth="60.0" text="Venue ID" />
+                <TableColumn fx:id="colLieuNom" prefWidth="150.0" text="Venue Name" />
+                <TableColumn fx:id="colEventId" prefWidth="60.0" text="Event ID" />
+                <TableColumn fx:id="colEventNom" prefWidth="150.0" text="Event Name" />
+                <TableColumn fx:id="colReservationId" prefWidth="80.0" text="Reservation ID" />
                 <TableColumn fx:id="colDescription" prefWidth="200.0" text="Description" />
             </columns>
         </TableView>
     </center>
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" spacing="10" styleClass="table-footer">
+            <padding>
+                <Insets bottom="10" left="15" right="15" top="10" />
+            </padding>
+            <Button onAction="#handleClose" styleClass="close-button" text="Close" />
+        </HBox>
+    </bottom>
 </BorderPane>
