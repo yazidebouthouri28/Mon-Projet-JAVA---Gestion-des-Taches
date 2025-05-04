@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane stylesheets="@resources/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.MainController">
+<BorderPane stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.MainController">
 
     <!-- Sidebar Dashboard -->
     <left>
@@ -45,7 +45,7 @@
             <Label styleClass="section-title" text="All Venues" />
 
             <ScrollPane fitToWidth="true" styleClass="scroll-pane">
-                <FlowPane fx:id="cardsContainer" hgap="15" styleClass="cards-container" vgap="15" prefWrapLength="1000" />
+                <FlowPane fx:id="cardsContainer" hgap="50" prefWrapLength="1000" styleClass="cards-container" vgap="50" />
             </ScrollPane>
         </VBox>
     </center>

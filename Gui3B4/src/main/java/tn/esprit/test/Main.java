@@ -11,20 +11,20 @@ public class Main {
 
         try {
             //Ajouter un nouveau lieu
-            sl.ajouter(new Lieu("SSSSSSSSSSSSSSSS", "xxxxxddddxxxxxxx", 70));
+            sl.ajouter(new Lieu("SSSSSSSSSSSSSSSS", "xxxxxxxxxx", 70));
             System.out.println("Lieu ajouté !");
 
              //Modifier un lieu existant (décommenter pour utiliser)
-            sl.modifier(new Lieu(6, "Gassrine", "groupeeeeeeeeee", 999));
-            System.out.println("Lieu modifié !");
+            //sl.modifier(new Lieu(6, "Gassrine", "groupeeeeeeeeee", 999));
+            //System.out.println("Lieu modifié !");
 
             //supprimer un lieu (décommenter pour utiliser)
-            sl.supprimer(5);
-            System.out.println("Lieu supprimé !");
+            //sl.supprimer(5);
+            //System.out.println("Lieu supprimé !");
 
              //Afficher tous les lieux
-            System.out.println("Liste des lieux :");
-            System.out.println(sl.afficher());
+           // System.out.println("Liste des lieux :");
+            //System.out.println(sl.afficher());
         } catch (SQLException e) {
             System.err.println("Erreur SQL: " + e.getMessage());
             e.printStackTrace();

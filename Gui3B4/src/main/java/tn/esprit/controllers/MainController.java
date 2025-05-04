@@ -20,6 +20,12 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.animation.FadeTransition;
+import javafx.animation.SequentialTransition;
+import javafx.animation.TranslateTransition;
+import javafx.util.Duration;
+
+
 public class MainController {
     @FXML private FlowPane cardsContainer;
     @FXML private VBox sidebar;
@@ -48,31 +54,34 @@ public class MainController {
 
         try {
             List<Lieu> lieux = serviceLieu.afficher();
+            int index = 0;
             for (Lieu lieu : lieux) {
-                cardsContainer.getChildren().add(createLieuCard(lieu));
+                Node card = createLieuCard(lieu);
+                cardsContainer.getChildren().add(card);
+                playCardEntryAnimation(card, index++);
             }
         } catch (SQLException e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
     }
 
+
     private Node createLieuCard(Lieu lieu) {
         VBox card = new VBox(10);
         card.getStyleClass().add("lieu-card");
 
-        // Image placeholder
+        // Chargement de l'image location_image.png
         ImageView imageView = new ImageView();
         try {
-            // You can replace this with actual images from your project
-            Image image = new Image(getClass().getResourceAsStream("/images/venue-placeholder.jpg"));
+            Image image = new Image(getClass().getResourceAsStream("/tn/esprit/views/images/location_image.png"));
             imageView.setImage(image);
         } catch (Exception e) {
-            // Fallback to a colored rectangle
-            imageView.setFitWidth(200);
-            imageView.setFitHeight(150);
+            System.err.println("Image not found: " + e.getMessage());
         }
+
         imageView.setFitWidth(200);
         imageView.setFitHeight(150);
+        imageView.setPreserveRatio(true);
         imageView.getStyleClass().add("card-image");
 
         Label title = new Label(lieu.getNom());
@@ -84,14 +93,12 @@ public class MainController {
         Label capacite = new Label("Capacity: " + lieu.getCapacite());
         capacite.getStyleClass().add("card-detail");
 
-        // Select button
         Button btnSelect = new Button("Select");
         btnSelect.getStyleClass().add("card-button");
         btnSelect.setOnAction(e -> {
             selectedLieu = lieu;
             highlightSelectedCard(card);
 
-            // Enable action buttons
             btnModifier.setDisable(false);
             btnSupprimer.setDisable(false);
             btnEvenements.setDisable(false);
@@ -100,6 +107,7 @@ public class MainController {
         card.getChildren().addAll(imageView, title, adresse, capacite, btnSelect);
         return card;
     }
+
 
     private void highlightSelectedCard(VBox selectedCard) {
         // Remove highlight from all cards
@@ -244,4 +252,19 @@ public class MainController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+    private void playCardEntryAnimation(Node node, int index) {
+        FadeTransition fade = new FadeTransition(Duration.millis(300), node);
+        fade.setFromValue(0);
+        fade.setToValue(1);
+
+        TranslateTransition slide = new TranslateTransition(Duration.millis(300), node);
+        slide.setFromY(20);
+        slide.setToY(0);
+
+        SequentialTransition animation = new SequentialTransition();
+        animation.getChildren().addAll(fade, slide);
+        animation.setDelay(Duration.millis(index * 100)); // delay based on index
+        animation.play();
+    }
+
 }
