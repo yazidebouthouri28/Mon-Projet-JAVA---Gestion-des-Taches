@@ -167,54 +167,43 @@
     -fx-text-fill: #7f8c8d;
 }
 
-/* Card Button */
+/* Card Button Base */
 .card-button {
-    -fx-background-color: #3498db;
-    -fx-text-fill: white;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
     -fx-background-radius: 15px;
     -fx-padding: 6px 14px;
     -fx-min-width: 90px;
+    -fx-text-fill: white;
+    -fx-background-color: #3498db; /* Couleur bleue par défaut */
 }
 
 .card-button:hover {
-    -fx-background-color: #2980b9;
+    -fx-background-color: #2980b9; /* Couleur bleue plus foncée au survol */
 }
 
-/* Delete button */
-.card-button:nth-child(2) {
+/* Delete button - Red */
+.delete-button {
     -fx-background-color: #e74c3c;
 }
-
-.card-button:nth-child(2):hover {
+.delete-button:hover {
     -fx-background-color: #c0392b;
 }
+
 /* Add New Location button in green */
 #btnAjouter {
     -fx-background-color: #27ae60;
 }
-
 #btnAjouter:hover {
     -fx-background-color: #1e8449;
 }
 
-/* Refresh / Update button in yellow */
+/* Refresh button in yellow */
 #btnActualiser {
     -fx-background-color: #f1c40f;
     -fx-text-fill: black;
 }
-
 #btnActualiser:hover {
     -fx-background-color: #d4ac0d;
-}
-
-/* Delete button (second card-button) already red, reassert here for clarity */
-.card-button:nth-child(2) {
-    -fx-background-color: #e74c3c;
-}
-
-.card-button:nth-child(2):hover {
-    -fx-background-color: #c0392b;
 }
