@@ -15,12 +15,10 @@
 
     <!-- Sidebar Dashboard -->
     <left>
-        <VBox fx:id="sidebar" spacing="15" styleClass="sidebar">
+        <VBox fx:id="sidebar" spacing="25" styleClass="sidebar">
             <padding>
-                <Insets bottom="25" left="15" right="15" top="25" />
+                <Insets bottom="25" left="15" right="15" top="0" />
             </padding>
-
-            <Label styleClass="sidebar-title" text="ADMIN DASHBOARD" />
 
             <Separator styleClass="sidebar-separator" />
 
@@ -49,9 +47,9 @@
                     <Insets bottom="5" top="5" />
                 </padding>
                 <children>
-                    <Label styleClass="section-title" text="All Venues" />
+                    <Label styleClass="section-title" text="All Locations" />
                     <Region HBox.hgrow="ALWAYS" />
-                    <Button fx:id="btnAjouter" onAction="#handleAjouter" styleClass="action-btn" text="Add New Venue" />
+                    <Button fx:id="btnAjouter" onAction="#handleAjouter" styleClass="action-btn" text="Add New Location" />
                     <Button fx:id="btnActualiser" onAction="#handleActualiser" styleClass="action-btn" text="Refresh" />
                 </children>
                 <HBox.margin>

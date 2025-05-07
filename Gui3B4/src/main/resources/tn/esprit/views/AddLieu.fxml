@@ -15,7 +15,7 @@
 
     <VBox spacing="20" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
 
-        <Label styleClass="form-title" text="Add New Venue" />
+        <Label styleClass="form-title" text="Add New Location" />
 
         <GridPane hgap="10" vgap="15">
             <padding>

@@ -51,12 +51,21 @@ public class MainController {
     public void initialize() {
         setupToolbar();
         loadLieuxCards();
+
+        // Ajuster la taille de la fenêtre pour occuper tout l'écran
+        mainBorderPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                Stage stage = (Stage) newScene.getWindow();
+                stage.setMaximized(true);
+            }
+        });
     }
 
     private void setupToolbar() {
         // Créer la toolbar
         ToolBar toolbar = new ToolBar();
         toolbar.getStyleClass().add("admin-toolbar");
+        toolbar.setPrefHeight(50); // Hauteur augmentée
 
         // Titre dashboard à gauche
         Label dashboardTitle = new Label("Admin Dashboard");
@@ -67,7 +76,7 @@ public class MainController {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         // Profil admin à droite
-        HBox profileBox = new HBox(5);
+        HBox profileBox = new HBox(10); // Espacement augmenté
         profileBox.setAlignment(Pos.CENTER);
 
         // Icône de profil
@@ -78,8 +87,8 @@ public class MainController {
         } catch (Exception e) {
             System.err.println("Profile image not found: " + e.getMessage());
         }
-        profileIcon.setFitHeight(24);
-        profileIcon.setFitWidth(24);
+        profileIcon.setFitHeight(30); // Taille augmentée
+        profileIcon.setFitWidth(30);  // Taille augmentée
 
         // Texte "Admin"
         Label adminLabel = new Label("Admin");
