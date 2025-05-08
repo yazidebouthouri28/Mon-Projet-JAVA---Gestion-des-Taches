@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
@@ -13,25 +14,37 @@
 
 <BorderPane fx:id="mainBorderPane" prefHeight="600.0" prefWidth="1100.0" stylesheets="@resources/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.MainController">
 
+    <!-- Toolbar -->
+    <top>
+        <HBox alignment="CENTER" style="-fx-background-color: #102c57; -fx-padding: 15; -fx-spacing: 20;">
+            <!-- Logo ou titre -->
+            <Label style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 18px;" text="Admin Dashboard" />
+            <Region HBox.hgrow="ALWAYS" />
+            <!-- Profil utilisateur -->
+            <HBox alignment="CENTER" onMouseClicked="#handleProfileClick" spacing="10" style="-fx-cursor: hand;">
+                <ImageView fx:id="profileImage" fitHeight="40" fitWidth="40" />
+                <VBox spacing="2">
+                    <Label fx:id="userNameLabel" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" />
+                    <Label style="-fx-text-fill: #bdc3c7; -fx-font-size: 12px;" text="Admin Level" />
+                </VBox>
+            </HBox>
+            <!-- Statut -->
+            <Label fx:id="statusLabel" style="-fx-text-fill: #4CAF50; -fx-font-size: 14px;" text="Bienvenue, admin" />
+        </HBox>
+    </top>
+
     <!-- Sidebar Dashboard -->
     <left>
-        <VBox fx:id="sidebar" spacing="25" styleClass="sidebar">
-            <padding>
-                <Insets bottom="25" left="15" right="15" top="0" />
-            </padding>
-
-            <Separator styleClass="sidebar-separator" />
-
-            <Button fx:id="btnUserManagement" onAction="#handleUserManagement" styleClass="dashboard-btn" text="User Management" />
-            <Button fx:id="btnEventManagement" onAction="#handleEventManagement" styleClass="dashboard-btn" text="Event Management" />
-            <Button fx:id="btnWorkshopManagement" onAction="#handleWorkshopManagement" styleClass="dashboard-btn" text="WorkShop Management" />
-            <Button fx:id="btnStockManagement" onAction="#handleStockManagement" styleClass="dashboard-btn" text="Stock Management" />
-            <Button fx:id="btnLocationManagement" onAction="#handleLocationManagement" styleClass="dashboard-btn" text="Location Management" />
-            <Button fx:id="btnSubscription" onAction="#handleSubscription" styleClass="dashboard-btn" text="Subscription" />
-
+        <VBox fx:id="sidebarMenu" spacing="15" style="-fx-background-color: #102c57; -fx-padding: 20 15;">
+            <Separator style="-fx-background-color: rgba(255,255,255,0.3);" />
+            <Button fx:id="btnUserManagement" onAction="#handleUserManagement" style="-fx-font-size: 14px;                            -fx-background-color: white;                            -fx-text-fill: #0c3b8c;                            -fx-font-weight: bold;                            -fx-pref-width: 180px;                            -fx-padding: 8 12;                            -fx-background-radius: 5;" text="Users" />
+            <Button fx:id="btnEventManagement" onAction="#handleEventManagement" style="-fx-font-size: 14px;                            -fx-background-color: white;                            -fx-text-fill: #0c3b8c;                            -fx-font-weight: bold;                            -fx-pref-width: 180px;                            -fx-padding: 8 12;                            -fx-background-radius: 5;" text="Events" />
+            <Button fx:id="btnWorkshopManagement" onAction="#handleWorkshopManagement" style="-fx-font-size: 14px;                            -fx-background-color: white;                            -fx-text-fill: #0c3b8c;                            -fx-font-weight: bold;                            -fx-pref-width: 180px;                            -fx-padding: 8 12;                            -fx-background-radius: 5;" text="Workshops" />
+            <Button fx:id="btnStockManagement" onAction="#handleStockManagement" style="-fx-font-size: 14px;                            -fx-background-color: white;                            -fx-text-fill: #0c3b8c;                            -fx-font-weight: bold;                            -fx-pref-width: 180px;                            -fx-padding: 8 12;                            -fx-background-radius: 5;" text="Stock" />
+            <Button fx:id="btnLocationManagement" onAction="#handleLocationManagement" style="-fx-font-size: 14px;                            -fx-background-color: white;                            -fx-text-fill: #0c3b8c;                            -fx-font-weight: bold;                            -fx-pref-width: 180px;                            -fx-padding: 8 12;                            -fx-background-radius: 5;" text="Locations" />
+            <Button fx:id="btnSubscription" onAction="#showSubscriptionManagement" style="-fx-font-size: 14px;                            -fx-background-color: white;                            -fx-text-fill: #0c3b8c;                            -fx-font-weight: bold;                            -fx-pref-width: 180px;                            -fx-padding: 8 12;                            -fx-background-radius: 5;" text="Subscriptions" />
+            <Button fx:id="btnLogout" onAction="#handleLogout" style="-fx-font-size: 14px;                            -fx-background-color: white;                            -fx-text-fill: #d70f0f;                            -fx-font-weight: bold;                            -fx-pref-width: 180px;                            -fx-padding: 8 12;                            -fx-background-radius: 5;" text="Log Out" />
             <Region VBox.vgrow="ALWAYS" />
-
-            <Button fx:id="btnExit" onAction="#handleExit" styleClass="quit-btn" text="Exit" />
         </VBox>
     </left>
 

@@ -33,23 +33,28 @@ import javafx.geometry.Insets;
 
 public class MainController {
     @FXML private FlowPane cardsContainer;
-    @FXML private VBox sidebar;
+    @FXML private VBox sidebarMenu;
     @FXML private BorderPane mainBorderPane;
 
-    // Les nouveaux boutons du sidebar
+    // Nouveaux composants pour le Toolbar
+    @FXML private ImageView profileImage;
+    @FXML private Label userNameLabel;
+    @FXML private Label statusLabel;
+
+    // Boutons du sidebar
     @FXML private Button btnUserManagement;
     @FXML private Button btnEventManagement;
     @FXML private Button btnWorkshopManagement;
     @FXML private Button btnStockManagement;
     @FXML private Button btnLocationManagement;
     @FXML private Button btnSubscription;
-    @FXML private Button btnExit;
+    @FXML private Button btnLogout;
 
     private final ServiceLieu serviceLieu = new ServiceLieu();
 
     @FXML
     public void initialize() {
-        setupToolbar();
+        setupUIComponents();
         loadLieuxCards();
 
         // Ajuster la taille de la fenêtre pour occuper tout l'écran
@@ -61,51 +66,37 @@ public class MainController {
         });
     }
 
-    private void setupToolbar() {
-        // Créer la toolbar
-        ToolBar toolbar = new ToolBar();
-        toolbar.getStyleClass().add("admin-toolbar");
-        toolbar.setPrefHeight(50); // Hauteur augmentée
-
-        // Titre dashboard à gauche
-        Label dashboardTitle = new Label("Admin Dashboard");
-        dashboardTitle.getStyleClass().add("dashboard-title");
-
-        // Espace flexible au milieu
-        javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        // Profil admin à droite
-        HBox profileBox = new HBox(10); // Espacement augmenté
-        profileBox.setAlignment(Pos.CENTER);
-
-        // Icône de profil
-        ImageView profileIcon = new ImageView();
+    private void setupUIComponents() {
+        // Configuration de l'image de profil
         try {
-            Image profileImage = new Image(getClass().getResourceAsStream("/tn/esprit/views/images/admin_profile.png"));
-            profileIcon.setImage(profileImage);
+            Image image = new Image(getClass().getResourceAsStream("/tn/esprit/views/images/admin_profile.png"));
+            profileImage.setImage(image);
+            profileImage.setFitWidth(40);
+            profileImage.setFitHeight(40);
+
+            // Ajouter un effet de cercle pour l'image de profil
+            profileImage.setStyle("-fx-background-radius: 50%; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0.2, 0, 1);");
         } catch (Exception e) {
             System.err.println("Profile image not found: " + e.getMessage());
         }
-        profileIcon.setFitHeight(30); // Taille augmentée
-        profileIcon.setFitWidth(30);  // Taille augmentée
 
-        // Texte "Admin"
-        Label adminLabel = new Label("Admin");
-        adminLabel.getStyleClass().add("admin-label");
+        // Configuration du nom d'utilisateur
+        userNameLabel.setText("Admin User");
 
-        // Bouton de déconnexion
-        Button logoutBtn = new Button("Logout");
-        logoutBtn.getStyleClass().add("logout-btn");
-        logoutBtn.setOnAction(e -> handleLogout());
+        // Appliquer les styles aux boutons du sidebar si nécessaire
+        applyStylesButtons();
+    }
 
-        profileBox.getChildren().addAll(profileIcon, adminLabel, logoutBtn);
-
-        // Ajouter tous les éléments à la toolbar
-        toolbar.getItems().addAll(dashboardTitle, spacer, profileBox);
-
-        // Ajouter la toolbar au haut du BorderPane
-        mainBorderPane.setTop(toolbar);
+    private void applyStylesButtons() {
+        // Si vous souhaitez appliquer des styles via code plutôt que FXML
+        // Vous pouvez également utiliser les classes CSS que nous avons définies
+        btnUserManagement.getStyleClass().add("sidebar-btn");
+        btnEventManagement.getStyleClass().add("sidebar-btn");
+        btnWorkshopManagement.getStyleClass().add("sidebar-btn");
+        btnStockManagement.getStyleClass().add("sidebar-btn");
+        btnLocationManagement.getStyleClass().add("sidebar-btn");
+        btnSubscription.getStyleClass().add("sidebar-btn");
+        btnLogout.getStyleClass().add("logout-btn");
     }
 
     private void loadLieuxCards() {
@@ -247,46 +238,68 @@ public class MainController {
 
     @FXML
     private void handleUserManagement() {
-        // À implémenter
+        statusLabel.setText("User Management Selected");
+        // À implémenter la logique complète
     }
 
     @FXML
     private void handleEventManagement() {
-        // À implémenter
+        statusLabel.setText("Event Management Selected");
+        // À implémenter la logique complète
     }
 
     @FXML
     private void handleWorkshopManagement() {
-        // À implémenter
+        statusLabel.setText("Workshop Management Selected");
+        // À implémenter la logique complète
     }
 
     @FXML
     private void handleStockManagement() {
-        // À implémenter
+        statusLabel.setText("Stock Management Selected");
+        // À implémenter la logique complète
     }
 
     @FXML
     private void handleLocationManagement() {
-        // À implémenter
+        statusLabel.setText("Location Management Selected");
+        // À implémenter la logique complète
     }
 
     @FXML
-    private void handleSubscription() {
-        // À implémenter
+    private void showSubscriptionManagement() {
+        statusLabel.setText("Subscription Management Selected");
+        // À implémenter la logique complète
+    }
+
+    @FXML
+    private void handleLogout() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Logout Confirmation");
+        alert.setHeaderText("Confirm Logout");
+        alert.setContentText("Are you sure you want to logout?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            showAlert(Alert.AlertType.INFORMATION, "Logout", "Successfully logged out!");
+
+            // Fermer l'application ou rediriger vers la page de connexion
+            // Pour l'instant, on ferme simplement la fenêtre
+            Stage stage = (Stage) sidebarMenu.getScene().getWindow();
+            stage.close();
+        }
+    }
+
+    @FXML
+    private void handleProfileClick() {
+        // Afficher un dialogue de profil ou un menu contextuel
+        showAlert(Alert.AlertType.INFORMATION, "Profile", "Profile options will be available soon!");
     }
 
     @FXML
     private void handleExit() {
-        Stage stage = (Stage) sidebar.getScene().getWindow();
+        Stage stage = (Stage) sidebarMenu.getScene().getWindow();
         stage.close();
-    }
-
-    private void handleLogout() {
-        // Logique de déconnexion à implémenter
-        showAlert(Alert.AlertType.INFORMATION, "Logout", "Logging out...");
-
-        // Fermer l'application ou rediriger vers la page de connexion
-        // À implémenter selon vos besoins
     }
 
     public void showAlert(Alert.AlertType type, String title, String message) {
