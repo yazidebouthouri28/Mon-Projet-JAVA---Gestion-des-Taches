@@ -32,6 +32,7 @@ public class MainController {
     @FXML private FlowPane cardsContainer;
     @FXML private VBox sidebarMenu;
     @FXML private BorderPane mainBorderPane;
+    @FXML private TextField searchField;
 
     @FXML private ImageView profileImage;
     @FXML private Label userNameLabel;
@@ -44,6 +45,7 @@ public class MainController {
     @FXML private Button btnLocationManagement;
     @FXML private Button btnSubscription;
     @FXML private Button btnLogout;
+    @FXML private Button btnSearch;
 
     private final ServiceLieu serviceLieu = new ServiceLieu();
     private Stage stage;
@@ -59,6 +61,7 @@ public class MainController {
     public void initialize() {
         setupUIComponents();
         loadLieuxCards();
+        setupSearchFieldListener();
     }
 
     private void setupUIComponents() {
@@ -78,6 +81,19 @@ public class MainController {
         applyStylesButtons();
     }
 
+    // Configuration du listener pour le champ de recherche (recherche pendant la saisie)
+    private void setupSearchFieldListener() {
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() >= 2) {
+                // Déclencher la recherche après 2 caractères
+                performSearch(newValue);
+            } else if (newValue.isEmpty()) {
+                // Recharger tous les lieux si le champ est vide
+                loadLieuxCards();
+            }
+        });
+    }
+
     private void applyStylesButtons() {
         btnUserManagement.getStyleClass().add("sidebar-btn");
         btnEventManagement.getStyleClass().add("sidebar-btn");
@@ -92,14 +108,48 @@ public class MainController {
         cardsContainer.getChildren().clear();
         try {
             List<Lieu> lieux = serviceLieu.afficher();
-            int index = 0;
-            for (Lieu lieu : lieux) {
-                Node card = createLieuCard(lieu);
-                cardsContainer.getChildren().add(card);
-                playCardEntryAnimation(card, index++);
-            }
+            loadCardsFromList(lieux);
         } catch (SQLException e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+        }
+    }
+
+    // Nouvelle méthode pour charger les cartes à partir d'une liste de lieux
+    private void loadCardsFromList(List<Lieu> lieux) {
+        cardsContainer.getChildren().clear();
+        int index = 0;
+        for (Lieu lieu : lieux) {
+            Node card = createLieuCard(lieu);
+            cardsContainer.getChildren().add(card);
+            playCardEntryAnimation(card, index++);
+        }
+    }
+
+    // Nouvelle méthode pour gérer le bouton de recherche
+    @FXML
+    private void handleSearch() {
+        String searchTerm = searchField.getText().trim();
+        performSearch(searchTerm);
+    }
+
+    // Méthode qui effectue la recherche
+    private void performSearch(String searchTerm) {
+        if (searchTerm.isEmpty()) {
+            loadLieuxCards();
+            return;
+        }
+
+        try {
+            List<Lieu> searchResults = serviceLieu.rechercherLieux(searchTerm);
+            loadCardsFromList(searchResults);
+
+            if (searchResults.isEmpty()) {
+                statusLabel.setText("Aucun lieu trouvé pour: " + searchTerm);
+            } else {
+                statusLabel.setText(searchResults.size() + " lieu(x) trouvé(s) pour: " + searchTerm);
+            }
+        } catch (SQLException e) {
+            showAlert(Alert.AlertType.ERROR, "Erreur de recherche", e.getMessage());
         }
     }
 
@@ -109,7 +159,7 @@ public class MainController {
 
         ImageView imageView = new ImageView();
         try {
-            URL imageUrl = getClass().getResource("/tn/esprit/views/images/992211.png");
+            URL imageUrl = getClass().getResource("/tn/esprit/views/images/Hbelt.png");
             if (imageUrl != null) {
                 Image image = new Image(imageUrl.toString());
                 imageView.setImage(image);
@@ -239,6 +289,7 @@ public class MainController {
     }
 
     @FXML private void handleActualiser() {
+        searchField.clear();  // Réinitialiser le champ de recherche
         loadLieuxCards();
         showAlert(Alert.AlertType.INFORMATION, "Refresh", "Venue list has been refreshed!");
     }

@@ -71,6 +71,31 @@ public class ServiceLieu {
         return lieux;
     }
 
+    // Nouvelle méthode de recherche de lieux
+    public List<Lieu> rechercherLieux(String searchTerm) throws SQLException {
+        List<Lieu> lieux = new ArrayList<>();
+        String query = "SELECT * FROM lieux WHERE nom LIKE ? OR adresse LIKE ?";
+
+        try (PreparedStatement pst = connection.prepareStatement(query)) {
+            String searchPattern = "%" + searchTerm + "%";
+            pst.setString(1, searchPattern);
+            pst.setString(2, searchPattern);
+
+            try (ResultSet rs = pst.executeQuery()) {
+                while (rs.next()) {
+                    Lieu lieu = new Lieu(
+                            rs.getInt("IdLieu"),
+                            rs.getString("nom"),
+                            rs.getString("adresse"),
+                            rs.getInt("capacite")
+                    );
+                    lieux.add(lieu);
+                }
+            }
+        }
+        return lieux;
+    }
+
     // Seule méthode ajoutée pour les événements associés
     public ObservableList<InfoLieu> getEvenementsParLieu(int lieuId) {
         ObservableList<InfoLieu> data = FXCollections.observableArrayList();

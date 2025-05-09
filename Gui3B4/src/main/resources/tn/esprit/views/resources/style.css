@@ -211,3 +211,15 @@
 #btnActualiser:hover {
     -fx-background-color: #d4ac0d;
 }
+/* Animation pour les résultats de recherche */
+.search-result-highlight {
+    -fx-background-color: rgba(16, 44, 87, 0.1);
+    -fx-background-radius: 3;
+    -fx-padding: 2;
+}
+/* Animation pour les résultats de recherche */
+.search-result-highlight {
+    -fx-background-color: rgba(16, 44, 87, 0.1);
+    -fx-background-radius: 3;
+    -fx-padding: 2;
+}
