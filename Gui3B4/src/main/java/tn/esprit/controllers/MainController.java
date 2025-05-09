@@ -8,17 +8,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import tn.esprit.entities.Lieu;
 import tn.esprit.services.ServiceLieu;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +26,6 @@ import javafx.animation.SequentialTransition;
 import javafx.animation.TranslateTransition;
 import javafx.util.Duration;
 import javafx.geometry.Pos;
-import javafx.geometry.Insets;
 
 
 public class MainController {
@@ -36,12 +33,10 @@ public class MainController {
     @FXML private VBox sidebarMenu;
     @FXML private BorderPane mainBorderPane;
 
-    // Nouveaux composants pour le Toolbar
     @FXML private ImageView profileImage;
     @FXML private Label userNameLabel;
     @FXML private Label statusLabel;
 
-    // Boutons du sidebar
     @FXML private Button btnUserManagement;
     @FXML private Button btnEventManagement;
     @FXML private Button btnWorkshopManagement;
@@ -51,45 +46,39 @@ public class MainController {
     @FXML private Button btnLogout;
 
     private final ServiceLieu serviceLieu = new ServiceLieu();
+    private Stage stage;
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+        if (stage != null) {
+            stage.setMaximized(true);
+        }
+    }
 
     @FXML
     public void initialize() {
         setupUIComponents();
         loadLieuxCards();
-
-        // Ajuster la taille de la fenêtre pour occuper tout l'écran
-        mainBorderPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene != null) {
-                Stage stage = (Stage) newScene.getWindow();
-                stage.setMaximized(true);
-            }
-        });
     }
 
     private void setupUIComponents() {
-        // Configuration de l'image de profil
         try {
-            Image image = new Image(getClass().getResourceAsStream("/tn/esprit/views/images/admin_profile.png"));
-            profileImage.setImage(image);
+            URL profileImageUrl = getClass().getResource("/tn/esprit/views/images/admin_profile.png");
+            if (profileImageUrl != null) {
+                profileImage.setImage(new Image(profileImageUrl.toString()));
+            }
             profileImage.setFitWidth(40);
             profileImage.setFitHeight(40);
-
-            // Ajouter un effet de cercle pour l'image de profil
             profileImage.setStyle("-fx-background-radius: 50%; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0.2, 0, 1);");
         } catch (Exception e) {
-            System.err.println("Profile image not found: " + e.getMessage());
+            System.err.println("Failed to load profile image: " + e.getMessage());
         }
 
-        // Configuration du nom d'utilisateur
         userNameLabel.setText("Admin User");
-
-        // Appliquer les styles aux boutons du sidebar si nécessaire
         applyStylesButtons();
     }
 
     private void applyStylesButtons() {
-        // Si vous souhaitez appliquer des styles via code plutôt que FXML
-        // Vous pouvez également utiliser les classes CSS que nous avons définies
         btnUserManagement.getStyleClass().add("sidebar-btn");
         btnEventManagement.getStyleClass().add("sidebar-btn");
         btnWorkshopManagement.getStyleClass().add("sidebar-btn");
@@ -101,7 +90,6 @@ public class MainController {
 
     private void loadLieuxCards() {
         cardsContainer.getChildren().clear();
-
         try {
             List<Lieu> lieux = serviceLieu.afficher();
             int index = 0;
@@ -119,19 +107,29 @@ public class MainController {
         VBox card = new VBox(10);
         card.getStyleClass().add("lieu-card");
 
-        // Chargement de l'image location_image.png
         ImageView imageView = new ImageView();
         try {
-            Image image = new Image(getClass().getResourceAsStream("/tn/esprit/views/images/location_image.png"));
-            imageView.setImage(image);
+            URL imageUrl = getClass().getResource("/tn/esprit/views/images/992211.png");
+            if (imageUrl != null) {
+                Image image = new Image(imageUrl.toString());
+                imageView.setImage(image);
+                imageView.setFitWidth(100);
+                imageView.setFitHeight(100);
+                imageView.setPreserveRatio(true);
+                imageView.getStyleClass().add("card-image");
+                card.getChildren().add(imageView);
+            } else {
+                throw new Exception("Image URL is null");
+            }
         } catch (Exception e) {
-            System.err.println("Image not found: " + e.getMessage());
+            System.err.println("Could not load image: " + e.getMessage());
+            Label placeholder = new Label("Map");
+            placeholder.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 15px; -fx-text-fill: #555; -fx-border-color: #ddd;");
+            placeholder.setPrefWidth(75);
+            placeholder.setPrefHeight(75);
+            placeholder.setAlignment(Pos.CENTER);
+            card.getChildren().add(placeholder);
         }
-
-        imageView.setFitWidth(200);
-        imageView.setFitHeight(150);
-        imageView.setPreserveRatio(true);
-        imageView.getStyleClass().add("card-image");
 
         Label title = new Label(lieu.getNom());
         title.getStyleClass().add("card-title");
@@ -142,26 +140,23 @@ public class MainController {
         Label capacite = new Label("Capacity: " + lieu.getCapacite());
         capacite.getStyleClass().add("card-detail");
 
-        // Container pour les boutons d'action
-        HBox buttonsContainer = new HBox(10);
+        HBox buttonsContainer = new HBox(5);
         buttonsContainer.setAlignment(Pos.CENTER);
 
-        // Bouton Update
         Button btnUpdate = new Button("Update");
         btnUpdate.getStyleClass().add("card-button");
-        btnUpdate.setOnAction(e -> {
-            openModifyDialog(lieu);
-        });
+        btnUpdate.setOnAction(e -> openModifyDialog(lieu));
 
-        // Bouton Delete
         Button btnDelete = new Button("Delete");
         btnDelete.getStyleClass().addAll("card-button", "delete-button");
-        btnDelete.setOnAction(e -> {
-            handleDeleteLieu(lieu);
-        });
+        btnDelete.setOnAction(e -> handleDeleteLieu(lieu));
 
-        buttonsContainer.getChildren().addAll(btnUpdate, btnDelete);
-        card.getChildren().addAll(imageView, title, adresse, capacite, buttonsContainer);
+        Button btnShowEvents = new Button("Events");
+        btnShowEvents.getStyleClass().addAll("card-button", "events-button");
+        btnShowEvents.setOnAction(e -> showEventsForLieu(lieu));
+
+        buttonsContainer.getChildren().addAll(btnUpdate, btnDelete, btnShowEvents);
+        card.getChildren().addAll(title, adresse, capacite, buttonsContainer);
 
         return card;
     }
@@ -170,20 +165,17 @@ public class MainController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/tn/esprit/views/ModifyLieu.fxml"));
             Parent root = loader.load();
-
             ModifyLieuController controller = loader.getController();
             controller.setLieu(lieu);
             controller.setMainController(this);
 
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Modify Venue");
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setTitle("Modify Venue");
+            dialogStage.setScene(new Scene(root));
+            dialogStage.showAndWait();
 
-            // Refresh the list after modification
             loadLieuxCards();
-
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Cannot open modify venue window: " + e.getMessage());
         }
@@ -207,6 +199,24 @@ public class MainController {
         }
     }
 
+    private void showEventsForLieu(Lieu lieu) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/tn/esprit/views/EventsParLieu.fxml"));
+            Parent root = loader.load();
+
+            EventsParLieuController controller = loader.getController();
+            controller.setLieuId(lieu.getId());
+
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setTitle("Events for " + lieu.getNom());
+            dialogStage.setScene(new Scene(root));
+            dialogStage.show();
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Cannot open events window: " + e.getMessage());
+        }
+    }
+
     @FXML
     private void handleAjouter() {
         try {
@@ -216,61 +226,29 @@ public class MainController {
             AddLieuController controller = loader.getController();
             controller.setMainController(this);
 
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Add New Venue");
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setTitle("Add New Venue");
+            dialogStage.setScene(new Scene(root));
+            dialogStage.showAndWait();
 
-            // Refresh the list after adding
             loadLieuxCards();
-
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Error", "Cannot open add venue window: " + e.getMessage());
         }
     }
 
-    @FXML
-    private void handleActualiser() {
+    @FXML private void handleActualiser() {
         loadLieuxCards();
         showAlert(Alert.AlertType.INFORMATION, "Refresh", "Venue list has been refreshed!");
     }
 
-    @FXML
-    private void handleUserManagement() {
-        statusLabel.setText("User Management Selected");
-        // À implémenter la logique complète
-    }
-
-    @FXML
-    private void handleEventManagement() {
-        statusLabel.setText("Event Management Selected");
-        // À implémenter la logique complète
-    }
-
-    @FXML
-    private void handleWorkshopManagement() {
-        statusLabel.setText("Workshop Management Selected");
-        // À implémenter la logique complète
-    }
-
-    @FXML
-    private void handleStockManagement() {
-        statusLabel.setText("Stock Management Selected");
-        // À implémenter la logique complète
-    }
-
-    @FXML
-    private void handleLocationManagement() {
-        statusLabel.setText("Location Management Selected");
-        // À implémenter la logique complète
-    }
-
-    @FXML
-    private void showSubscriptionManagement() {
-        statusLabel.setText("Subscription Management Selected");
-        // À implémenter la logique complète
-    }
+    @FXML private void handleUserManagement() { statusLabel.setText("User Management Selected"); }
+    @FXML private void handleEventManagement() { statusLabel.setText("Event Management Selected"); }
+    @FXML private void handleWorkshopManagement() { statusLabel.setText("Workshop Management Selected"); }
+    @FXML private void handleStockManagement() { statusLabel.setText("Stock Management Selected"); }
+    @FXML private void handleLocationManagement() { statusLabel.setText("Location Management Selected"); }
+    @FXML private void showSubscriptionManagement() { statusLabel.setText("Subscription Management Selected"); }
 
     @FXML
     private void handleLogout() {
@@ -278,28 +256,21 @@ public class MainController {
         alert.setTitle("Logout Confirmation");
         alert.setHeaderText("Confirm Logout");
         alert.setContentText("Are you sure you want to logout?");
-
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+        if (result.isPresent() && result.get() == ButtonType.OK && stage != null) {
             showAlert(Alert.AlertType.INFORMATION, "Logout", "Successfully logged out!");
-
-            // Fermer l'application ou rediriger vers la page de connexion
-            // Pour l'instant, on ferme simplement la fenêtre
-            Stage stage = (Stage) sidebarMenu.getScene().getWindow();
             stage.close();
         }
     }
 
-    @FXML
-    private void handleProfileClick() {
-        // Afficher un dialogue de profil ou un menu contextuel
+    @FXML private void handleProfileClick() {
         showAlert(Alert.AlertType.INFORMATION, "Profile", "Profile options will be available soon!");
     }
 
-    @FXML
-    private void handleExit() {
-        Stage stage = (Stage) sidebarMenu.getScene().getWindow();
-        stage.close();
+    @FXML private void handleExit() {
+        if (stage != null) {
+            stage.close();
+        }
     }
 
     public void showAlert(Alert.AlertType type, String title, String message) {
@@ -319,9 +290,8 @@ public class MainController {
         slide.setFromY(20);
         slide.setToY(0);
 
-        SequentialTransition animation = new SequentialTransition();
-        animation.getChildren().addAll(fade, slide);
-        animation.setDelay(Duration.millis(index * 100)); // delay based on index
+        SequentialTransition animation = new SequentialTransition(fade, slide);
+        animation.setDelay(Duration.millis(index * 100));
         animation.play();
     }
 }

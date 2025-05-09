@@ -165,12 +165,12 @@
 
 /* Card Button Base */
 .card-button {
-    -fx-font-size: 13px;
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
     -fx-background-radius: 15px;
-    -fx-padding: 6px 14px;
-    -fx-min-width: 90px;
+    -fx-padding: 6px 10px;
+    -fx-min-width: 80px;
     -fx-text-fill: white;
     -fx-background-color: #3498db; /* Couleur bleue par défaut */
 }
@@ -185,6 +185,14 @@
 }
 .delete-button:hover {
     -fx-background-color: #c0392b;
+}
+
+/* Events button - Brown */
+.events-button {
+    -fx-background-color: #8B4513; /* SaddleBrown */
+}
+.events-button:hover {
+    -fx-background-color: #A0522D; /* Sienna */
 }
 
 /* Add New Location button in green */
